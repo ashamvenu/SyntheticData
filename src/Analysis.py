@@ -32,6 +32,6 @@ objplt.xticks(y_position, x_position,fontweight='bold')
 objplt.ylabel('Proximity Level',fontweight='bold')
 #objplt.title('Proximity between the real and the synthetic data for each algorithm')
 
-objplt.savefig('F:/MS-CS/Thesis/Dataset/Output10.png', dpi=1200)
+objplt.savefig('F:/MS-CS/Thesis/Dataset/Output.png', dpi=1200)
 
 objplt.show()
