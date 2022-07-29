@@ -47,7 +47,7 @@ class PandasLabelEncoder(BaseEstimator, TransformerMixin):
 
 startTime = time.time();
 
-dataset = objpandas.read_csv('/home/mannara/SyntheticData/Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
+dataset = objpandas.read_csv('Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
 
 #Print the count of rows and coulmns in csv file
 print("Dimensions of Dataset: {}".format(dataset.shape))
