@@ -20,9 +20,13 @@ import os, multiprocessing, time
 from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
 from collections import defaultdict
+from sdv.evaluation import evaluate
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 import seaborn as sns
+import warnings
+warnings.filterwarnings('ignore')
+
 
 class PandasLabelEncoder(BaseEstimator, TransformerMixin):
     def __init__(self):
@@ -50,7 +54,7 @@ class PandasLabelEncoder(BaseEstimator, TransformerMixin):
 startTime = time.time();
 
 #Load the data-set
-dataset = objpandas.read_csv('F:/MS-CS/Thesis/Dataset/electronics75k.csv', encoding='unicode_escape', low_memory=False)
+dataset = objpandas.read_csv('/home/mannara/SyntheticData/Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
 
 #Print the count of rows and coulmns in csv file
 print("Dimensions of Dataset: {}".format(dataset.shape))
@@ -165,8 +169,9 @@ k_g = 1  # number of generator network updates per adversarial training step
 critic_pre_train_steps = 100 # 100  # number of steps to pre-train the critic before starting adversarial training
 log_interval = 100 # 100  # interval (in steps) at which to log loss summaries and save plots of image samples to disc
 learning_rate = 5e-4 # 5e-5
-data_dir = 'F:/MS-CS/Thesis/Dataset/Cache/'
+data_dir = '/home/mannara/SyntheticData/Output/GAN/Cache/'
 generator_model_path, discriminator_model_path, loss_pickle_path = None, None, None
+
 
 # show = False
 show = True 
@@ -180,13 +185,13 @@ label_cols = [ i for i in train.columns if 'Class' in i ]
 data_cols = [ i for i in train.columns if i not in label_cols ]
 #train[ data_cols ] = train[ data_cols ] / 10 # scale to random noise size, one less thing to learn
 train_no_label = train[ data_cols ]
-
 #print('# label_cols: ',len(label_cols))
 #print('# data_cols: ',len(data_cols))
 #print('# train_no_label: ',len(train_no_label))
 
 # Training the vanilla GAN and CGAN architectures
-k_d = 1  # number of critic network updates per adversarial training step
+k_d = 1 # number of critic network updates per adversarial training step
+
 learning_rate = 5e-4 # 5e-5
 arguments = [rand_dim, nb_steps, batch_size, 
              k_d, k_g, critic_pre_train_steps, log_interval, learning_rate, base_n_count,
@@ -270,7 +275,7 @@ def processData(*x):
 def writetofile(data_list):
     
     #write data to csv files
-    with open('F:/MS-CS/Thesis/Dataset/GOutput75.csv', 'w', newline='') as file:
+    with open('/home/mannara/SyntheticData/Output/GAN/GanAdult10.csv', 'w', newline='') as file:
         objwriter = csv.writer(file, delimiter=',')
         objwriter.writerows(data_list)
 
@@ -286,6 +291,9 @@ t5.join()
 endTime = time.time();
 
 print("Processing Time In Seconds:::", (endTime - startTime))
+
+synthetic = objpandas.read_csv('/home/mannara/SyntheticData/Output/GAN/GanAdult10.csv', encoding='unicode_escape', low_memory=False)
+
 
 x = objnumpy.array(x)
 
@@ -303,13 +311,13 @@ df_synthetic = objpandas.DataFrame(data = x[0],
 
 fig, ax = plt.subplots(figsize=(10,10))
 
-sns_plot = sns.heatmap(df_real.corr() - df_synthetic.corr(), annot=True, fmt=".2f", ax=ax, cmap="twilight")
+sns_plot = sns.heatmap(df_real.corr() - df_synthetic.corr(), annot=True, fmt=".2f", ax=ax, cmap="pink_r")
 
 plt.title('GAN', fontsize = 20)
 plt.xlabel("Real Data",fontweight='bold') 
 plt.ylabel("Synthetic Data",fontweight='bold') 
 
-sns_plot.figure.savefig("F:/MS-CS/Thesis/Dataset/G_Heatmap75.png", dpi=1200)
+sns_plot.figure.savefig("/home/mannara/SyntheticData/Output/GAN/GanHeatmapAdult.png", dpi=1200)
 
 plt.show()
 
@@ -319,10 +327,22 @@ meanValue = diff.mean()
   
 print("Mean is :", meanValue)
 
-meanList = [columnHeaders]
+meanList = []
 meanList.append(meanValue.values)
 
 #write data to csv files
-with open('F:/MS-CS/Thesis/Dataset/Output75.csv', 'w', newline='') as file:
+with open('/home/mannara/SyntheticData/Output/OutputAdult10.csv', 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(meanList)
+
+eval_score = evaluate(synthetic, dataset)
+
+eval_roc = eval_score.mean()
+output = 'Output'
+eval_list = [output]
+eval_list.append(eval_roc)
+print('SD Metrics:', eval_score)
+
+with open('/home/mannara/SyntheticData/Output/ROCOutputAdult10.csv', 'w', newline='') as file:
+	objwriter = csv.writer(file, delimiter=',')
+	objwriter.writerows(map(lambda x: [x], eval_list))

@@ -10,20 +10,23 @@ from random import randint
 from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
 from numpy import array
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM
+from keras.models import Sequential
+from keras.layers import LSTM
 #from keras.layers import CuDNNLSTM 
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import RepeatVector
-from tensorflow.keras.layers import TimeDistributed
+from keras.layers import Dense
+from keras.layers import RepeatVector
+from keras.layers import TimeDistributed
 #from keras.utils import plot_model
-from tensorflow.keras import backend as K
+from keras import backend as K
+from sdv.evaluation import evaluate
 from multiprocessing.pool import ThreadPool as Pool
 import time
 import threading
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 import seaborn as sns
+import warnings
+warnings.filterwarnings('ignore')
 
 class PandasLabelEncoder(BaseEstimator, TransformerMixin):
     def __init__(self):
@@ -51,7 +54,7 @@ class PandasLabelEncoder(BaseEstimator, TransformerMixin):
 startTime = time.time();
 
 #Load the data-set
-dataset = objpandas.read_csv('F:/MS-CS/Thesis/Dataset/electronics_200.csv', encoding='unicode_escape', low_memory=False) 
+dataset = objpandas.read_csv('/home/mannara/SyntheticData/Input/adult30.csv', encoding='unicode_escape', low_memory=False)
 
 #Print the count of rows and coulmns in csv file
 print("Dimensions of Dataset: {}".format(dataset.shape))
@@ -250,10 +253,10 @@ def objectItertaor(k, z, test, d):
             
             #print('-----------------------')     
             
-            #print(n_transform[k]);
+            #print(n_transform[k]);            #rint('round:', abs(round(int(t))))
+
             
-            #rint('round:', abs(round(int(t))))  
-                
+
             t = abs(round(int(t)))
                           
             y = numericstoobjectConverter(k, z, t, test)                                 
@@ -294,11 +297,11 @@ def processData(encoded_X):
 def writetofile(data_list):
     
     #write data to csv files
-    with open('F:/MS-CS/Thesis/Dataset/VOutput200.csv', 'w', newline='') as file:
+    with open('/home/mannara/SyntheticData/Output/VAE/VaeAdult.csv', 'w', newline='') as file:
         objwriter = csv.writer(file, delimiter=',')
         objwriter.writerows(data_list)
 
-pool = Pool(1000);
+pool = Pool(10000);
 pool.map(processData, encoded_X);
 pool.close()
 pool.join()
@@ -314,6 +317,8 @@ t5.join()
 endTime = time.time();
 
 print("Processin Time In Seconds:::", (endTime - startTime))
+
+synthetic = objpandas.read_csv('/home/mannara/SyntheticData/Output/VAE/VaeAdult.csv', encoding='unicode_escape', low_memory=False)
 
 encoded_X = objnumpy.array(encoded_X)
 
@@ -331,13 +336,13 @@ df_synthetic = objpandas.DataFrame(data = encoded_X,
 
 fig, ax = plt.subplots(figsize=(10,10))
 
-sns_plot = sns.heatmap(df_real.corr() - df_synthetic.corr(), annot=True, fmt=".2f", ax=ax, cmap="twilight")
+sns_plot = sns.heatmap(df_real.corr() - df_synthetic.corr(), annot=True, fmt=".2f", ax=ax, cmap="pink_r")
 
 plt.title('Variable Auto-Encoder', fontsize = 20)
 plt.xlabel("Real Data",fontweight='bold') 
 plt.ylabel("Synthetic Data",fontweight='bold') 
 
-sns_plot.figure.savefig("F:/MS-CS/Thesis/Dataset/V_Heatmap200.png", dpi=1200)
+sns_plot.figure.savefig("/home/mannara/SyntheticData/Output/VAE/VaeHeatmapAdult.png", dpi=1200)
 
 plt.show()
 
@@ -352,6 +357,16 @@ meanList = []
 meanList.append(meanValue.values)
 
 #write data to csv files
-with open('F:/MS-CS/Thesis/Dataset/Output200.csv', 'a', newline='') as file:
+with open('/home/mannara/SyntheticData/Output/OutputAdult.csv', 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(meanList)
+
+eval_score = evaluate(synthetic, dataset)
+eval_roc = eval_score.mean()
+eval_list = []
+eval_list.append(eval_roc)
+print('SD Metrics :', eval_score)
+
+with open('/home/mannara/SyntheticData/Output/ROCOutputAdult.csv', 'a', newline='') as file:
+	objwriter = csv.writer(file, delimiter=',')
+	objwriter.writerows(map(lambda x: [x],eval_list))

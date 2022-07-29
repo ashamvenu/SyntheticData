@@ -1,27 +1,26 @@
-#import libraries 
 from collections import defaultdict
 import csv
-from imblearn.over_sampling import SMOTE
+import json
 import numpy as objnumpy
+import numpy as np
 import pandas as objpandas
 from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
+from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
+from synthpop import Synthpop
+import os, multiprocessing
+os.environ["OMP_NUM_THREADS"] = "100"
 from sdv.evaluation import evaluate
 import threading
 from multiprocessing.pool import ThreadPool as Pool
-import os, multiprocessing, time
-os.environ["OMP_NUM_THREADS"] = "100"
-from scipy.stats import pearsonr
+import time
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 import seaborn as sns
+import warnings
 from pandas.plotting import scatter_matrix
 import statistics
-import warnings
-warnings.filterwarnings('ignore')
 
 class PandasLabelEncoder(BaseEstimator, TransformerMixin):
     def __init__(self):
@@ -46,10 +45,9 @@ class PandasLabelEncoder(BaseEstimator, TransformerMixin):
         return X.apply(lambda x: objpandas.Categorical.from_codes(codes=x.values,
                        categories=self.label_dict[x.name]))
 
-startTime = time.time()
-#Load the data-set
-dataset = objpandas.read_csv('/home/mannara/SyntheticData/Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
+startTime = time.time();
 
+dataset = objpandas.read_csv('/home/mannara/SyntheticData/Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
 
 #Print the count of rows and coulmns in csv file
 print("Dimensions of Dataset: {}".format(dataset.shape))
@@ -131,57 +129,56 @@ new_dataset.columns = list(B)
 print("new_dataset.columns: ", new_dataset.columns)
 
 # you want all rows, and the feature_cols' columns
-a = new_dataset.iloc[:, 0: n_features].values
-b = new_dataset.iloc[:, 6: 7].values
+p = new_dataset.iloc[:, 0: n_features].values
+q = new_dataset.iloc[:, 2: 3].values
+
+
+a = new_dataset.iloc[:, 0: n_features]
+b = new_dataset.iloc[:, 2: 3]
 
 print(a)
-#print(b)
 
-#smote_on_1 = 164
-smote_on_1 = 6887
-#smote_on_1 = 12936
-#smote_on_1 = 95428
-#smote_on_1 = 450265
-#transform the dataset
-oversample = SMOTE(random_state=2, k_neighbors=1, sampling_strategy={1: smote_on_1})
+X_train, X_test, y_train, y_test = train_test_split(a, b, test_size=0.2, random_state=0)
+regressor = LinearRegression()  
+regressor.fit(X_train, y_train)
 
-X, y = oversample.fit_resample(a.astype(objnumpy.int64), b.astype(objnumpy.int64).ravel())
+cf_df = objpandas.DataFrame(a) 
 
-print("Value of X: ", X)
-print("Value of Y: ", y)
+print(cf_df)
 
-print("Length of X: ", len(X))
-print("Length of Y: ", len(y))
+column_ind = [0,1,2,3,4,5,6,7,8,9,10]
+new_names = ['age','user_id','education','category','martial_status','occupation','relationship','gender','hours','country_from','salary']
+old_names = cf_df.columns[column_ind]
+cf_df.rename(columns=dict(zip(old_names, new_names)), inplace=True)
+sp = Synthpop()
 
-#Print Coulmn Headers
-print(columnHeaders)
+
+dtypes = {"age": "int",
+ "user_id": "int",
+ "education": "int",
+ "category": "int",
+ "martial_status": "int",
+ "occupation": "int",
+ "relationship": "int",
+ "gender": "int",
+ "hours": "int",
+ "country_from": "int",
+ "salary": "int"
+ }
+
+sp.fit(a, dtypes)
+
+synth_df= spop.generate(len(a))
+
+print(synth_df)
+
+m = synth_df.iloc[:, 0: n_features].values
+n = synth_df.iloc[:, 2: 3].values
+
+print(m)
 
 data_list = [columnHeaders]
 
-#print(le.inverse_transform(new_dataset['timestamp']))
-
-# split into 70:30 ration 
-train_Xaxis, test_Xaxis, train_Yaxis, test_Yaxis = train_test_split(X, y, test_size=0.3, random_state=0) 
-
-# describes info about train and test set 
-print("No of Transactions train_Xaxis dataset: ", train_Xaxis.shape) 
-print("No of Transactions train_Yaxis dataset: ", train_Yaxis.shape) 
-print("No of Transactions test_Xaxis dataset: ", test_Xaxis.shape) 
-print("No of Transactions test_Yaxis dataset: ", test_Yaxis.shape) 
-
-# logistic regression object 
-lr = LogisticRegression() 
-
-# train the model on train set 
-lr.fit(train_Xaxis.astype(objnumpy.int64), train_Yaxis.astype(objnumpy.int64).ravel())
-
-predictions = lr.predict(train_Xaxis.astype(objnumpy.int64))
-# print classification report 
-print(classification_report(train_Yaxis.astype(objnumpy.int64), predictions))
-
-print("Before OverSampling, counts of label '1': {}".format(sum(train_Yaxis == 1))) 
-print("Before OverSampling, counts of label '0': {} \n".format(sum(train_Yaxis == 0))) 
-    
 #Function to match output
 def matcher(test, output):
         
@@ -260,7 +257,7 @@ def objectItertaor(k, z, test, d):
         
         z += 1;
 	
-def processData(*train_Xaxis):
+def processData(*m):
     
 	#print('train_Xaxis::', train_Xaxis)
 
@@ -273,7 +270,7 @@ def processData(*train_Xaxis):
 
 	test = [];    
 
-	objectItertaor(k, z, test, train_Xaxis);    
+	objectItertaor(k, z, test, m);    
 
 	#t1 = threading.Thread(target=objectItertaor, args=(k, z, test, train_Xaxis[d],))     
 	#t1.start()
@@ -286,12 +283,12 @@ def processData(*train_Xaxis):
 def writetofile(data_list):
     
     #write data to csv files
-    with open('/home/mannara/SyntheticData/Output/SMOTE/SmoteAdult10.csv', 'w', newline='') as file:
+    with open('/home/mannara/SyntheticData/Output/SYNTHPOP/SpOutputAdult10.csv', 'w', newline='') as file:
         objwriter = csv.writer(file, delimiter=',')
         objwriter.writerows(data_list)
 
 pool = Pool(1000);
-pool.map(processData, train_Xaxis);
+pool.map(processData, m);
 pool.close()
 pool.join()
 
@@ -299,42 +296,44 @@ pool.join()
 #t4.start()
 #t4.join()
 
-
-
 t5 = threading.Thread(target=writetofile, args=(data_list,))     
 t5.start()
 t5.join()
+
+synthetic = objpandas.read_csv('/home/mannara/SyntheticData/Output/SYNTHPOP/SpOutputAdult10.csv', encoding='unicode_escape', low_memory=False)
+
 
 endTime = time.time();
 
 print("Processing Time In Seconds:::", (endTime - startTime))
 
-synthetic = objpandas.read_csv('/home/mannara/SyntheticData/Output/SMOTE/SmoteAdult10.csv', encoding='unicode_escape', low_memory=False)
-
-
-df_real = objpandas.DataFrame(data = a,
-          index = objnumpy.array(range(0, len(a))),
+df_real = objpandas.DataFrame(data = p,
+          index = objnumpy.array(range(0, len(p))),
           columns = [columnHeaders])
 
-df_synthetic = objpandas.DataFrame(data = train_Xaxis,
-          index = objnumpy.array(range(0, len(train_Xaxis))),
+df_synthetic = objpandas.DataFrame(data = m,
+          index = objnumpy.array(range(0, len(m))),
           columns = [columnHeaders])
+          
 		
 fig, ax = plt.subplots(figsize=(10,10))
 		
 sns_plot = sns.heatmap(df_real.corr() - df_synthetic.corr(), annot=True, fmt=".2f", ax=ax, cmap="pink_r")
 
-plt.title('SMOTE', fontsize = 20)
+plt.title('Sp-Np', fontsize = 20)
 plt.xlabel("Real Data",fontweight='bold') 
 plt.ylabel("Synthetic Data",fontweight='bold') 
 
-sns_plot.figure.savefig("/home/mannara/SyntheticData/Output/SMOTE/SmoteHeatmap200.png", dpi=1200)
+sns_plot.figure.savefig("/home/mannara/SyntheticData/Output/SYNTHPOP/SPN_Heatmap200.png", dpi=1200)
+#sns_plot.figure.savefig(args["heatmap"], dpi=1200)
 
 plt.show()
 
 diff = df_real.corr() - df_synthetic.corr();
 
 meanValue = diff.mean()
+
+#print(r2_score(df_real, df_synthetic))
   
 print("Mean is :", meanValue)
 
@@ -343,18 +342,18 @@ meanList.append(meanValue.values)
 
 #write data to csv files
 with open('/home/mannara/SyntheticData/Output/OutputAdult10.csv', 'a', newline='') as file:
+#with open(args["finaloutput"], 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(meanList)
 
-
+warnings.filterwarnings('ignore')
 
 eval_score = evaluate(synthetic, dataset)
 eval_roc = eval_score.mean()
-#output = 'Output'
 eval_list = []
 eval_list.append(eval_roc)
 print('SD Metrics :', eval_score)
 
-with open('/home/mannara/SyntheticData/Output/ROCOutputAdult10.csv', 'w', newline='') as file:
+with open('/home/mannara/SyntheticData/Output/ROCOutputAdult10.csv', 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(map(lambda x: [x], eval_list))
