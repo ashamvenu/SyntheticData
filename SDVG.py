@@ -25,7 +25,7 @@ warnings.filterwarnings('ignore')
 
 startTime = time.time();
 
-dataset = objpandas.read_csv('/home/mannara/SyntheticData/Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
+dataset = objpandas.read_csv('/Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
 
 
 model = CTGAN()
@@ -248,7 +248,7 @@ n = new_dataset1.iloc[:, 2: 3].values
 
 print(m)
 
-synthetic.to_csv('/home/mannara/SyntheticData/Output/SDV-GAN/SDVOutputAdult10.csv', index=False)
+synthetic.to_csv('/Output/SDV-GAN/SDVOutputAdult10.csv', index=False)
 
 endTime = time.time();
 
@@ -271,7 +271,7 @@ plt.title('SDV-GAN', fontsize = 20)
 plt.xlabel("Real Data",fontweight='bold') 
 plt.ylabel("Synthetic Data",fontweight='bold') 
 
-sns_plot.figure.savefig("/home/mannara/SyntheticData/Output/SDV-GAN/SD_Heatmap200.png", dpi=1200)
+sns_plot.figure.savefig("/Output/SDV-GAN/SD_Heatmap200.png", dpi=1200)
 #sns_plot.figure.savefig(args["heatmap"], dpi=1200)
 
 plt.show()
@@ -288,13 +288,13 @@ meanList = []
 meanList.append(meanValue.values)
 
 #write data to csv files
-with open('/home/mannara/SyntheticData/Output/OutputAdult10.csv', 'a', newline='') as file:
+with open('/Output/OutputAdult10.csv', 'a', newline='') as file:
 #with open(args["finaloutput"], 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(meanList)
 
 #warnings.filterwarnings('ignore')
-synthetic = objpandas.read_csv('/home/mannara/SyntheticData/Output/SDV-GAN/SDVOutputAdult10.csv', encoding='unicode_escape', low_memory=False)
+synthetic = objpandas.read_csv('/Output/SDV-GAN/SDVOutputAdult10.csv', encoding='unicode_escape', low_memory=False)
 eval_score = evaluate(synthetic, dataset)
 
 eval_roc = eval_score.mean()
@@ -302,6 +302,6 @@ eval_list = []
 eval_list.append(eval_roc)
 print('SD Metrics :', eval_score)
 
-with open('/home/mannara/SyntheticData/Output/ROCOutputAdult10.csv', 'a', newline='') as file:
+with open('/Output/ROCOutputAdult10.csv', 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(map(lambda x: [x], eval_list))

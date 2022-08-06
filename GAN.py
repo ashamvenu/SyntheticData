@@ -54,7 +54,7 @@ class PandasLabelEncoder(BaseEstimator, TransformerMixin):
 startTime = time.time();
 
 #Load the data-set
-dataset = objpandas.read_csv('/home/mannara/SyntheticData/Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
+dataset = objpandas.read_csv('/Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
 
 #Print the count of rows and coulmns in csv file
 print("Dimensions of Dataset: {}".format(dataset.shape))
@@ -169,7 +169,7 @@ k_g = 1  # number of generator network updates per adversarial training step
 critic_pre_train_steps = 100 # 100  # number of steps to pre-train the critic before starting adversarial training
 log_interval = 100 # 100  # interval (in steps) at which to log loss summaries and save plots of image samples to disc
 learning_rate = 5e-4 # 5e-5
-data_dir = '/home/mannara/SyntheticData/Output/GAN/Cache/'
+data_dir = '/Output/GAN/Cache/'
 generator_model_path, discriminator_model_path, loss_pickle_path = None, None, None
 
 
@@ -275,7 +275,7 @@ def processData(*x):
 def writetofile(data_list):
     
     #write data to csv files
-    with open('/home/mannara/SyntheticData/Output/GAN/GanAdult10.csv', 'w', newline='') as file:
+    with open('/Output/GAN/GanAdult10.csv', 'w', newline='') as file:
         objwriter = csv.writer(file, delimiter=',')
         objwriter.writerows(data_list)
 
@@ -292,7 +292,7 @@ endTime = time.time();
 
 print("Processing Time In Seconds:::", (endTime - startTime))
 
-synthetic = objpandas.read_csv('/home/mannara/SyntheticData/Output/GAN/GanAdult10.csv', encoding='unicode_escape', low_memory=False)
+synthetic = objpandas.read_csv('/Output/GAN/GanAdult10.csv', encoding='unicode_escape', low_memory=False)
 
 
 x = objnumpy.array(x)
@@ -317,7 +317,7 @@ plt.title('GAN', fontsize = 20)
 plt.xlabel("Real Data",fontweight='bold') 
 plt.ylabel("Synthetic Data",fontweight='bold') 
 
-sns_plot.figure.savefig("/home/mannara/SyntheticData/Output/GAN/GanHeatmapAdult.png", dpi=1200)
+sns_plot.figure.savefig("/Output/GAN/GanHeatmapAdult.png", dpi=1200)
 
 plt.show()
 
@@ -331,7 +331,7 @@ meanList = []
 meanList.append(meanValue.values)
 
 #write data to csv files
-with open('/home/mannara/SyntheticData/Output/OutputAdult10.csv', 'a', newline='') as file:
+with open('/Output/OutputAdult10.csv', 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(meanList)
 
@@ -343,6 +343,6 @@ eval_list = [output]
 eval_list.append(eval_roc)
 print('SD Metrics:', eval_score)
 
-with open('/home/mannara/SyntheticData/Output/ROCOutputAdult10.csv', 'w', newline='') as file:
+with open('/Output/ROCOutputAdult10.csv', 'w', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(map(lambda x: [x], eval_list))

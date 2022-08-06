@@ -19,7 +19,7 @@ import statistics
 
 startTime = time.time();
 
-dataset = objpandas.read_csv('/home/mannara/SyntheticData/Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
+dataset = objpandas.read_csv('/Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
 
 
 model = GaussianCopula()
@@ -242,7 +242,7 @@ n = new_dataset1.iloc[:, 2: 3].values
 
 print(m)
 
-synthetic.to_csv('/home/mannara/SyntheticData/Output/SDV-G/SDVOutputAdult10.csv', index=False)
+synthetic.to_csv('/Output/SDV-G/SDVOutputAdult10.csv', index=False)
 
 endTime = time.time();
 
@@ -265,7 +265,7 @@ plt.title('SDV-G', fontsize = 20)
 plt.xlabel("Real Data",fontweight='bold') 
 plt.ylabel("Synthetic Data",fontweight='bold') 
 
-sns_plot.figure.savefig("/home/mannara/SyntheticData/Output/SDV-G/SD_Heatmap200.png", dpi=1200)
+sns_plot.figure.savefig("/Output/SDV-G/SD_Heatmap200.png", dpi=1200)
 #sns_plot.figure.savefig(args["heatmap"], dpi=1200)
 
 plt.show()
@@ -282,7 +282,7 @@ meanList = []
 meanList.append(meanValue.values)
 
 #write data to csv files
-with open('/home/mannara/SyntheticData/Output/OutputAdult10.csv', 'a', newline='') as file:
+with open('/Output/OutputAdult10.csv', 'a', newline='') as file:
 #with open(args["finaloutput"], 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(meanList)
@@ -295,6 +295,6 @@ eval_list = []
 eval_list.append(eval_roc)
 print('SD Metrics :', eval_score)
 
-with open('/home/mannara/SyntheticData/Output/ROCOutputAdult10.csv', 'a', newline='') as file:
+with open('/Output/ROCOutputAdult10.csv', 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(map(lambda x: [x], eval_list))

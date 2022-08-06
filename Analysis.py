@@ -6,7 +6,7 @@ import numpy as objnumpy
 
 
 #Load the data-set
-dataset = objpandas.read_csv('/home/mannara/SyntheticData/Output/OutputAdult10.csv', encoding='unicode_escape', low_memory=False)
+dataset = objpandas.read_csv('/Output/OutputAdult10.csv', encoding='unicode_escape', low_memory=False)
 
 
 x_position = ('GAN', 'VAE', 'SMOTE', 'DS', 'SDV-G', 'SDV-GAN', 'SP-NP')
@@ -48,12 +48,12 @@ objplt.yticks(y_position, x_position)
 objplt.xlabel('Proximity Level',fontweight='bold')
 #objplt.title('Proximity between the real and the synthetic data for each algorithm')
 
-objplt.savefig('/home/mannara/SyntheticData/Output/OutputAdult.png', dpi=1200)
+objplt.savefig('/Output/OutputAdult.png', dpi=1200)
 
 objplt.show()
 
 #Load the data-set
-dataset1 = objpandas.read_csv('/home/mannara/SyntheticData/Output/ROCOutputAdult10.csv', encoding='unicode_escape', low_memory=False)
+dataset1 = objpandas.read_csv('/Output/ROCOutputAdult10.csv', encoding='unicode_escape', low_memory=False)
 
 
 x_position1 = ('GAN', 'VAE', 'SMOTE', 'DS', 'SDV-G', 'SDV-GAN', 'SP-NP')
@@ -92,6 +92,6 @@ objplt.yticks(y_position1, x_position1)
 objplt.xlabel('SD Metrics',fontweight='bold')
 #objplt.title('Proximity between the real and the synthetic data for each algorithm')
 
-objplt.savefig('/home/mannara/SyntheticData/Output/ROCOutputAdult.png', dpi=1200)
+objplt.savefig('/Output/ROCOutputAdult.png', dpi=1200)
 
 objplt.show()

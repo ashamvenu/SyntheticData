@@ -47,7 +47,7 @@ class PandasLabelEncoder(BaseEstimator, TransformerMixin):
 
 startTime = time.time();
 
-dataset = objpandas.read_csv('Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
+dataset = objpandas.read_csv('/Input/adult10k.csv', encoding='unicode_escape', low_memory=False)
 
 #Print the count of rows and coulmns in csv file
 print("Dimensions of Dataset: {}".format(dataset.shape))
@@ -283,7 +283,7 @@ def processData(*m):
 def writetofile(data_list):
     
     #write data to csv files
-    with open('/home/mannara/SyntheticData/Output/SYNTHPOP/SpOutputAdult10.csv', 'w', newline='') as file:
+    with open('/Output/SYNTHPOP/SpOutputAdult10.csv', 'w', newline='') as file:
         objwriter = csv.writer(file, delimiter=',')
         objwriter.writerows(data_list)
 
@@ -300,7 +300,7 @@ t5 = threading.Thread(target=writetofile, args=(data_list,))
 t5.start()
 t5.join()
 
-synthetic = objpandas.read_csv('/home/mannara/SyntheticData/Output/SYNTHPOP/SpOutputAdult10.csv', encoding='unicode_escape', low_memory=False)
+synthetic = objpandas.read_csv('/Output/SYNTHPOP/SpOutputAdult10.csv', encoding='unicode_escape', low_memory=False)
 
 
 endTime = time.time();
@@ -324,7 +324,7 @@ plt.title('Sp-Np', fontsize = 20)
 plt.xlabel("Real Data",fontweight='bold') 
 plt.ylabel("Synthetic Data",fontweight='bold') 
 
-sns_plot.figure.savefig("/home/mannara/SyntheticData/Output/SYNTHPOP/SPN_Heatmap200.png", dpi=1200)
+sns_plot.figure.savefig("/Output/SYNTHPOP/SPN_Heatmap200.png", dpi=1200)
 #sns_plot.figure.savefig(args["heatmap"], dpi=1200)
 
 plt.show()
@@ -341,7 +341,7 @@ meanList = []
 meanList.append(meanValue.values)
 
 #write data to csv files
-with open('/home/mannara/SyntheticData/Output/OutputAdult10.csv', 'a', newline='') as file:
+with open('/Output/OutputAdult10.csv', 'a', newline='') as file:
 #with open(args["finaloutput"], 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(meanList)
@@ -354,6 +354,6 @@ eval_list = []
 eval_list.append(eval_roc)
 print('SD Metrics :', eval_score)
 
-with open('/home/mannara/SyntheticData/Output/ROCOutputAdult10.csv', 'a', newline='') as file:
+with open('/Output/ROCOutputAdult10.csv', 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(map(lambda x: [x], eval_list))

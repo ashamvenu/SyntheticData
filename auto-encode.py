@@ -54,7 +54,7 @@ class PandasLabelEncoder(BaseEstimator, TransformerMixin):
 startTime = time.time();
 
 #Load the data-set
-dataset = objpandas.read_csv('/home/mannara/SyntheticData/Input/adult30.csv', encoding='unicode_escape', low_memory=False)
+dataset = objpandas.read_csv('/Input/adult30.csv', encoding='unicode_escape', low_memory=False)
 
 #Print the count of rows and coulmns in csv file
 print("Dimensions of Dataset: {}".format(dataset.shape))
@@ -297,7 +297,7 @@ def processData(encoded_X):
 def writetofile(data_list):
     
     #write data to csv files
-    with open('/home/mannara/SyntheticData/Output/VAE/VaeAdult.csv', 'w', newline='') as file:
+    with open('Output/VAE/VaeAdult.csv', 'w', newline='') as file:
         objwriter = csv.writer(file, delimiter=',')
         objwriter.writerows(data_list)
 
@@ -318,7 +318,7 @@ endTime = time.time();
 
 print("Processin Time In Seconds:::", (endTime - startTime))
 
-synthetic = objpandas.read_csv('/home/mannara/SyntheticData/Output/VAE/VaeAdult.csv', encoding='unicode_escape', low_memory=False)
+synthetic = objpandas.read_csv('/Output/VAE/VaeAdult.csv', encoding='unicode_escape', low_memory=False)
 
 encoded_X = objnumpy.array(encoded_X)
 
@@ -342,7 +342,7 @@ plt.title('Variable Auto-Encoder', fontsize = 20)
 plt.xlabel("Real Data",fontweight='bold') 
 plt.ylabel("Synthetic Data",fontweight='bold') 
 
-sns_plot.figure.savefig("/home/mannara/SyntheticData/Output/VAE/VaeHeatmapAdult.png", dpi=1200)
+sns_plot.figure.savefig("/Output/VAE/VaeHeatmapAdult.png", dpi=1200)
 
 plt.show()
 
@@ -357,7 +357,7 @@ meanList = []
 meanList.append(meanValue.values)
 
 #write data to csv files
-with open('/home/mannara/SyntheticData/Output/OutputAdult.csv', 'a', newline='') as file:
+with open('/Output/OutputAdult.csv', 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(meanList)
 
@@ -367,6 +367,6 @@ eval_list = []
 eval_list.append(eval_roc)
 print('SD Metrics :', eval_score)
 
-with open('/home/mannara/SyntheticData/Output/ROCOutputAdult.csv', 'a', newline='') as file:
+with open('/Output/ROCOutputAdult.csv', 'a', newline='') as file:
 	objwriter = csv.writer(file, delimiter=',')
 	objwriter.writerows(map(lambda x: [x],eval_list))
